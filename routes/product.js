@@ -9,5 +9,6 @@ router.post("/udpate", isAuth, productController.updateProduct);
 router.get("/remove/:id", isAuth, productController.removeProduct);
 router.get("/show", productController.getProducts);
 router.get("/show/:id", productController.getProductById);
+router.get("/:id", productController.getProductsByCategory);
 
 module.exports = router;

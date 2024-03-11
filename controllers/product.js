@@ -91,6 +91,33 @@ exports.removeProduct = function (req, res, next) {
   });
 };
 
+exports.getProductsByCategory = async function (req, res, next) {
+  errorHandler(req);
+
+  try {
+    const id = req.params.id;
+    const products = await Product.find({ category: id }).populate("category");
+
+    if (isEmpty(products)) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Products found",
+      data: products,
+    });
+  } catch (err) {
+    if (!res.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
 exports.getProductById = async function (req, res, next) {
   errorHandler(req);
 
