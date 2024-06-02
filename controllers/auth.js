@@ -1,18 +1,24 @@
 const Auth = require("../models/auth");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { validationResult } = require("express-validator");
 const { errorHandler } = require("../utils/error-handler");
+const isEmpty = require("lodash/isEmpty");
 require("dotenv").config();
 
 exports.registration = async (req, res, next) => {
-  errorHandler(req)
+  errorHandler(req);
 
-  const { name, email, password, phone } = req.body;
+  const { name, email, password, phone, role } = req.body;
 
   try {
     const encryptedPassword = await bcryptjs.hash(password, 12);
-    const dataAuth = new Auth({ name, email, password: encryptedPassword, phone });
+    const dataAuth = new Auth({
+      name,
+      email,
+      password: encryptedPassword,
+      phone,
+      role,
+    });
     const authResponse = await dataAuth.save();
 
     res.status(201).json({
@@ -29,24 +35,14 @@ exports.registration = async (req, res, next) => {
 };
 
 exports.login = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new Error("Validation Failed");
-    error.statusCode = 422;
-    error.data = errors.array();
-    throw error;
-  }
+  errorHandler(req, res, next);
 
-  const { user, password } = req.body;
-  const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+  const { email, password } = req.body;
 
   try {
-    let auth;
-    if (emailRegex.test(user)) {
-      auth = await Auth.findOne({ email: user });
-    }
+    const auth = await Auth.findOne({ email }).populate("role");
 
-    if (!auth) {
+    if (isEmpty(auth)) {
       res.status(403).send({
         success: false,
         message: "Invalid Credentials",

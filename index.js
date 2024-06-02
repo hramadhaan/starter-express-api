@@ -18,6 +18,7 @@ const categoryRoutes = require("./routes/category");
 const productRoutes = require("./routes/product");
 const cartRoutes = require("./routes/cart");
 const employeeRoutes = require("./routes/employee");
+const roleRoutes = require("./routes/role");
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -38,8 +39,10 @@ app.use("/category", categoryRoutes);
 app.use("/product", productRoutes);
 app.use("/cart", cartRoutes);
 app.use("/employee", employeeRoutes);
+app.use("/role", roleRoutes);
 
 app.use((error, req, res, next) => {
+  console.log("Error: ", error);
   const status = error.statusCode || 500;
   const message = error.data?.[0]?.msg || "Server Failure";
   res.status(status).json({
@@ -56,6 +59,7 @@ mongoose
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
-  }).catch((err) => {
-    console.error('Error while listening on', err)
+  })
+  .catch((err) => {
+    console.error("Error while listening on", err);
   });

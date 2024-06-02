@@ -23,8 +23,13 @@ const authSchema = new Schema(
     },
     cartId: {
       type: Schema.Types.ObjectId,
-      ref: 'cart'
-    }
+      ref: "cart",
+    },
+    role: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "role",
+    },
   },
   { timestamps: true }
 );
